@@ -1,48 +1,40 @@
+
 import vn.medianews.*;
 import java.util.*;
-import java.util.stream.Collectors;
-
 public class SapXepChuoiSoLuongNguyenAm {
     public static void main(String[] args) throws Exception {
-        String msv = "B21DCCN699", qCode = "erxWJr6S";
-
+        String msv = "B21DCCN699", qCode = "erxWJr6S"; 
         CharacterService_Service service = new CharacterService_Service();
         CharacterService port = service.getCharacterServicePort();
-
-        // a) lấy dữ liệu
-        List<String> input = port.requestStringArray(msv, qCode);
-        if (input == null) input = Collections.emptyList();
-
-        // b) gom nhóm theo số nguyên âm, nhóm sắp theo count tăng dần
-        Map<Integer, List<String>> groups = new TreeMap<>();
-        for (String raw : input) {
-            String s = raw == null ? "" : raw.trim();
-            int k = countVowels(s);
-            groups.computeIfAbsent(k, _k -> new ArrayList<>()).add(s);
+        List<String> a = port.requestStringArray(msv, qCode);
+        System.out.println(a);
+        Collections.sort(a, new Comparator<String>() {
+            @Override
+            public int compare(String s1, String s2) {
+                if(dem(s1)!=dem(s2)) return dem(s1) - dem(s2);
+                return s1.compareTo(s2);
+            }
+        });
+        List<String>ans = new java.util.ArrayList<>();
+        String gr = a.get(0);
+        for(int i = 1;i<a.size();i++){
+            if(dem(a.get(i))==dem(a.get(i - 1))) gr+=", " + a.get(i);
+            else{
+                ans.add(gr);
+                gr = a.get(i);
+            }
         }
-        // sort trong từng nhóm theo thứ tự TỰ NHIÊN của String (case-sensitive)
-        for (List<String> g : groups.values()) {
-            Collections.sort(g); // <-- quan trọng
-        }
-
-        // tạo List<String> kết quả: "từ1, từ2, ..."
-        List<String> result = groups.values().stream()
-                .map(list -> String.join(", ", list))
-                .collect(Collectors.toList());
-
-        // c) submit
-        port.submitCharacterStringArray(msv, qCode, result);
-
-        System.out.println("Input   : " + input);
-        System.out.println("Submit  : " + result);
+        ans.add(gr);
+        // c. Triệu gọi phương thức submitCharacterStringArray để gửi mảng đã sắp xếp
+        port.submitCharacterStringArray(msv, qCode, ans);
     }
-
-    private static int countVowels(String s) {
-        if (s == null) return 0;
+    // Hàm đếm số nguyên âm trong chuỗi
+    private static int dem(String str) {
         int cnt = 0;
-        for (int i = 0; i < s.length(); i++) {
-            char c = Character.toLowerCase(s.charAt(i));
-            if (c=='a' || c=='e' || c=='i' || c=='o' || c=='u') cnt++;
+        // Các ký tự nguyên âm
+        String ngAm = "aeiouAEIOU";
+        for (int i = 0; i < str.length(); i++) {
+            if (ngAm.indexOf(str.charAt(i)) != -1) cnt++;
         }
         return cnt;
     }

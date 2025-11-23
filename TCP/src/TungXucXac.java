@@ -18,6 +18,7 @@ public class TungXucXac {
         String code = "B21DCCN699;HSHG34";
         out.writeUTF(code);
         out.flush();
+        /*
         int n = in.readInt();
         int []a = new int[n];
         for(int i = 0; i < n; i++){
@@ -33,6 +34,25 @@ public class TungXucXac {
             out.writeFloat((float)(cnt[i]/n));
             out.flush();
             System.out.println((float)cnt[i]/n + " ");
+        }
+        */
+        int n = in.readInt();
+        int[]res = new int[n];
+        for (int i = 0; i<n; i++){
+            res[i] = in.readInt();
+            System.out.println(res[i]);
+        }
+        
+        int[]cnt = new int[15];
+        
+        for(int x : res){
+            cnt[x] += 1;
+        }
+        
+        for(int i = 1; i<=6; i++){
+            out.writeFloat((float)(cnt[i]/n));
+            out.flush();
+            System.out.println((float)(cnt[i]/n));
         }
         in.close();
         out.close();
